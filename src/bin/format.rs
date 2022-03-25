@@ -1,7 +1,7 @@
 #![no_main]
 #![no_std]
 
-use capteur_antoine as _; // global logger + panicking-behavior + memory layout
+use test_tlv493d as _; // global logger + panicking-behavior + memory layout
 use defmt::Format; // <- derive attribute
 
 #[derive(Format)]
@@ -25,5 +25,5 @@ fn main() -> ! {
     let x = 42;
     defmt::println!("x={=u8}", x);
 
-    capteur_antoine::exit()
+    test_tlv493d::exit()
 }

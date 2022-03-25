@@ -1,11 +1,11 @@
 #![no_main]
 #![no_std]
 
-use capteur_antoine as _; // global logger + panicking-behavior + memory layout
+use test_tlv493d as _; // global logger + panicking-behavior + memory layout
 
 #[cortex_m_rt::entry]
 fn main() -> ! {
     defmt::println!("Hello, world!");
 
-    capteur_antoine::exit()
+    test_tlv493d::exit()
 }

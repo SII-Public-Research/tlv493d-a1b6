@@ -1,12 +1,12 @@
 #![no_main]
 #![no_std]
 
-use capteur_antoine as _; // global logger + panicking-behavior + memory layout
+use test_tlv493d as _; // global logger + panicking-behavior + memory layout
 
 #[cortex_m_rt::entry]
 fn main() -> ! {
     ack(10, 10);
-    capteur_antoine::exit()
+    test_tlv493d::exit()
 }
 
 fn ack(m: u32, n: u32) -> u32 {

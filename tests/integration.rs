@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-use capteur_antoine as _; // memory layout + panic handler
+use test_tlv493d as _; // memory layout + panic handler
 
 // See https://crates.io/crates/defmt-test/0.3.0 for more documentation (e.g. about the 'state'
 // feature)
