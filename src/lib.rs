@@ -121,7 +121,7 @@ where
     E: core::fmt::Debug,
 {
     /// Create a new TLV493D instance
-    pub fn new(i2c: I2c, addr: u8, mode: Mode) -> Result<Self, Error<E>> {
+    pub fn new(i2c: I2c, addr: u8, mode: &Mode) -> Result<Self, Error<E>> {
         debug!("New Tlv493d with address: 0x{:02x}", addr);
         
         // Construct object
@@ -153,7 +153,7 @@ where
     }
 
 
-    pub fn configure(&mut self, mode: Mode) -> Result<(), Error<E>> {
+    pub fn configure(&mut self, mode: &Mode) -> Result<(), Error<E>> {
 
         let mut m1 = unsafe { Mode1::from_bits_unchecked(self.initial[7]) };
         let m2 = unsafe { Mode2::from_bits_unchecked(self.initial[9]) };
