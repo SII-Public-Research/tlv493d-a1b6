@@ -152,9 +152,12 @@ where
         Ok(s)
     }
 
-
+    // Method to configure the mode of foperation of the sensor
+    //  INPUTS :    - Mode : mode to use
+    //
+    //  OUTPUTS :   - Result<(), Error<E>>
+    //
     pub fn configure(&mut self, mode: &Mode) -> Result<(), Error<E>> {
-
         let mut m1 = unsafe { Mode1::from_bits_unchecked(self.initial[7]) };
         let m2 = unsafe { Mode2::from_bits_unchecked(self.initial[9]) };
 
@@ -195,7 +198,13 @@ where
         Ok(())
     }
 
-    // Read raw values from the sensor
+    // Method to read raw values from the sensor
+    // The sensor need to be already configured
+    //  INPUTS :    - 
+    //
+    //  OUTPUTS :   - Result<[i16; 4], Error<E>>
+    //                where [i16; 4] contains the values ==> Bx, By, Bz, Temp (no units)
+    //
     pub fn read_raw(&mut self) -> Result<[i16; 4], Error<E>> {
         let mut v = [0i16; 4];
 
@@ -211,7 +220,7 @@ where
             self.last_frm = frm;
         }
         
-        // Convert to values
+        // Convert to values (no units)
         // Double-cast here required for sign-extension
         v[0] = (b[0] as i8 as i16) << 4 | ((b[4] & 0xF0) >> 4) as i16;
         v[1] = (b[1] as i8 as i16) << 4 | (b[4] & 0x0F) as i16;
@@ -224,7 +233,25 @@ where
     }
 
 
-    // Function that read N times the magnetic field values on the sensor and return
+    // Read data and convert to correct values in mT and °C
+    // The sensor need to be already configured
+    //  INPUTS :    - 
+    //
+    //  OUTPUTS :   - Result<Values, Error<E>>
+    //                where Values contains the values ==> Bx, By, Bz, Temp (with good units)
+    //
+    pub fn read(&mut self) -> Result<Values, Error<E>> {
+        let raw = self.read_raw()?;
+        Ok(Values {
+            x: raw[0] as f32 * 0.098f32,
+            y: raw[1] as f32 * 0.098f32,
+            z: raw[2] as f32 * 0.098f32,
+            temp: (raw[3] - 340) as f32 * 1.1f32 + 24.2f32,
+        })
+    }
+
+
+    // Method that read N times the magnetic field values on the sensor and return
     // a Bfield struct containing the mean of the N measurements.
     // The means and standard-deviations are computed iteratively
     //
@@ -239,29 +266,25 @@ where
         let mut j = 0; //counter of valid measurements
         let mut i = 0; //counter of invalid measurements (read_raw function returning an error )
         //These variables are needed to compte Mean and StandardDeviation iteratively
-        let (mut bx_new, mut by_new, mut bz_new, mut bx_prev, mut by_prev, mut bz_prev): (f32, f32, f32, f32, f32, f32);
+        let (mut bx_prev, mut by_prev, mut bz_prev): (f32, f32, f32);
         //Looping until we get N valid measurements
         while j!= n {
             (*delay).delay_ms(1 as u16);
-            match self.read_raw()  {
-                Ok(v) => {
+            match self.read()  {
+                Ok(b_new) => {
                     j += 1;    //Iterating the number of valid measurements
 
                     bx_prev = b.bx; //
                     by_prev = b.by; //Storing previous means in 3 variables
                     bz_prev = b.bz; //
 
-                    bx_new  = (v[0] as f32) * 0.098; //
-                    by_new  = (v[1] as f32) * 0.098; //Compute new measurements
-                    bz_new  = (v[2] as f32) * 0.098; //
+                    b.bx = b.bx + (b_new.x - b.bx) / (j as f32) ; //
+                    b.by = b.by + (b_new.y - b.by) / (j as f32) ; //Compute new means
+                    b.bz = b.bz + (b_new.z - b.bz) / (j as f32) ; //
 
-                    b.bx = b.bx + (bx_new - b.bx) / (j as f32) ; //
-                    b.by = b.by + (by_new - b.by) / (j as f32) ; //Compute new means
-                    b.bz = b.bz + (bz_new - b.bz) / (j as f32) ; //
-
-                    b.ux = b.ux + (bx_new - bx_prev) * (bx_new - b.bx) ; //
-                    b.uy = b.uy + (by_new - by_prev) * (by_new - b.by) ; //Compute new variances
-                    b.uz = b.uz + (bz_new - bz_prev) * (bz_new - b.bz) ; //
+                    b.ux = b.ux + (b_new.x - bx_prev) * (b_new.x - b.bx) ; //
+                    b.uy = b.uy + (b_new.y - by_prev) * (b_new.y - b.by) ; //Compute new variances
+                    b.uz = b.uz + (b_new.z - bz_prev) * (b_new.z - b.bz) ; //
                 }
                 Err(error) => {
                     i += 1;   //Iterating the number of invalid mesurements
