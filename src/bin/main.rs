@@ -5,8 +5,8 @@ use tlv493d_raspberry::*;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create MPU
-    let i2c = I2c::new().expect("1");
-    let mut tlv = Tlv493d::new(i2c, ADDRESS_BASE, Mode::LowPower).unwrap();
+    let mut i2c = I2c::new().expect("1");
+    let mut tlv = Tlv493d::new(i2c, ADDRESS_BASE, Mode::Master).unwrap();
     let mut delay = rppal::hal::Delay::new();
 
     //Initialize the variable which will contain data
@@ -28,6 +28,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             Err(error) => {
                 println!("Erreur : {}", error);
+                match error {
+                    Error::AdcLockup => {
+                        i2c = I2c::new().expect("1");
+                        tlv = Tlv493d::new(i2c, ADDRESS_BASE, Mode::Master).unwrap();
+                    }
+                    _other => {}
+                }
             }
         } //end match
     } //end loop

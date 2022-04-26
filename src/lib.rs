@@ -84,17 +84,16 @@ where
 //                ---> 0.0 to 360.0 if measurement is correctly done
 //           - u_angle_xy : f32 (computed standard-deviation on angle_xy, in degrees °)
 //
-pub fn b_angle_xy(b : &Bfield ) -> (f32, f32) 
+pub fn b_angle_xy(b : &Bfield ) -> (f32,f32) 
 {
-    //Initializing the two variables (computed angle made by Bfield on the XY plan, and its standard-deviation computed with Bfield values)
-    let mut angle_xy   = 1000.0;
-    let mut u_angle_xy = 0.0   ;
     //Norm of magnetic field. If it is too low, the computed angle will not be reliable (it will mostly be based on noise)
     let norm_b = ( b.bx.powf(2.0) + b.by.powf(2.0) + b.bz.powf(2.0) ).sqrt();
     if norm_b > 1.5 {
         //Compute angle (four quadrant arctangent of By/Bx ), and its standard-deviation.
-        angle_xy = b.by.atan2(b.bx) * 180.0 / 3.1415;
-        u_angle_xy = ( (b.ux * b.by / (b.bx*b.bx + b.by*b.by)).powf(2.0)   +   (b.uy / (b.bx + b.by*b.by/b.bx )).powf(2.0) ).sqrt() * 180.0/3.1415;
+        let angle_xy = b.by.atan2(b.bx) * 180.0 / 3.1415;
+        let u_angle_xy = ( (b.ux * b.by / (b.bx*b.bx + b.by*b.by)).powf(2.0)   +   (b.uy / (b.bx + b.by*b.by/b.bx )).powf(2.0) ).sqrt() * 180.0/3.1415;
+        (angle_xy, u_angle_xy)
+    } else {
+        (1000.0, 0.0)
     }
-   return (angle_xy, u_angle_xy);
 }
