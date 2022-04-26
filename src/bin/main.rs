@@ -15,7 +15,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut _u_angle_xy: f32;
 
     //Setting up the number of measurement on which we want to compute the mean
-    let n = 50;
+    let n = 20;
 
 
     loop {

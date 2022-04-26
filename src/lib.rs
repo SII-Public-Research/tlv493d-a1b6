@@ -36,7 +36,7 @@ where
     let (mut bx_new, mut by_new, mut bz_new, mut bx_prev, mut by_prev, mut bz_prev): (f32, f32, f32, f32, f32, f32);
     //Looping until we get N valid measurements
     while j!= n {
-        (*delay).delay_ms(5 as u16);
+        (*delay).delay_ms(20 as u16);
         match tlv.read_raw()  {
             Ok(v) => {
                 j += 1;    //Iterating the number of valid measurements
