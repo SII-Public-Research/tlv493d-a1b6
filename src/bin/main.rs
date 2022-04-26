@@ -1,12 +1,10 @@
-use std;
 use rppal::i2c::I2c;
-use sensor_tlv493d::*;
-use tlv493d_raspberry::*;
+use tlv493d_raspberry::{Tlv493d, *};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create MPU
     let mut i2c = I2c::new().expect("1");
-    let mut tlv = Tlv493d::new(i2c, ADDRESS_BASE, Mode::Master).unwrap();
+    let mut tlv = Tlv493d::new(i2c, ADDRESS_BASE_1, Mode::Master).unwrap();
     let mut delay = rppal::hal::Delay::new();
 
     //Initialize the variable which will contain data
@@ -21,21 +19,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     loop {
         // get 3d hall data (computing means and standard-deviations over N measurements) : bx, by, bz
         match get_b_mean(&mut tlv, n, &mut delay) {
+
             Ok(b) => {
                 (angle_xy, _u_angle_xy) = b_angle_xy(&b);
                 println!("Bx={}mT By={}mT Bz={}mT AngleXY={}°",b.bx, b.by, b.bz, angle_xy);
                 _bfield = b;
             }
+
             Err(error) => {
-                println!("Erreur : {}", error);
+                println!("Erreur : {0:?}", error);
                 match error {
                     Error::AdcLockup => {
                         i2c = I2c::new().expect("1");
-                        tlv = Tlv493d::new(i2c, ADDRESS_BASE, Mode::Master).unwrap();
+                        tlv = Tlv493d::new(i2c, ADDRESS_BASE_1, Mode::Master).unwrap();
                     }
                     _other => {}
                 }
             }
+            
         } //end match
     } //end loop
 } //end main

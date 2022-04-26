@@ -9,4 +9,8 @@ edition = "2021"
 [dependencies]
 rppal = { version = "0.13.1", features = ["hal"] }
 embedded-hal = "0.2.7"
-sensor-tlv493d = "0.1.0"
+#sensor-tlv493d = "0.1.0"
+
+#Other dependencies for the "sensor-tlv493d" crate, modified here 
+bitflags = "1.2.1"
+log = "0.4.11"
