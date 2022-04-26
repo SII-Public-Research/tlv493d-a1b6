@@ -331,10 +331,11 @@ where
 
 
 ////////////////////////////////////////////////////////////////////////////////////
-//                        AJOUT PAR ANTOINE DE LAUNAY
+//                        AJOUT PAR MOI (ANTOINE DE LAUNAY)
 ////////////////////////////////////////////////////////////////////////////////////
 
 // Struct that contains the 3 components of the magnetic field, in mT, and their standard-deviations (>0 if several measurements are made)
+// "Values" already exists but does not include standard-deviation. A little bit redundant...
 pub struct Bfield {
     pub bx : f32, // X axis field compenent
     pub by : f32, // Y axis field component
