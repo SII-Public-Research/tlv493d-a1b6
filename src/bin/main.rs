@@ -19,10 +19,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         // get 3d hall data (computing means and standard-deviations over N measurements) : bx, by, bz
-        match get_b_mean(&mut tlv, n, &mut delay) 
+        match tlv.get_b_mean(n, &mut delay) 
         {
             Ok(b) => 
-            {   (angle_xy, _u_angle_xy) = b_angle_xy(&b);
+            {   (angle_xy, _u_angle_xy) = b.b_angle_xy();
                 println!("Bx={}mT By={}mT Bz={}mT AngleXY={}°",b.bx, b.by, b.bz, angle_xy);
                 _bfield = b;
             }
