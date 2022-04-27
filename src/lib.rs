@@ -129,16 +129,15 @@ where
             i2c, addr, initial: [0u8; 10], last_frm: 0xff, _e: PhantomData,
         };
 
-        // Startup per fig. 5.1 in TLV493D-A1B6 user manual
+        ////////////////////////// STARTUP PER FIG. 5.1 IN TLV493D-A1B6 USER MANUEL ///////////////////////
         // Write recovery value
-        // s.i2c.write(&[0xFF]).map_err(Error::I2c);
+        let _= s.i2c.write(0xFF, &[]);
 
         // Send reset command
-        // TODO: this does not appear to work?
         match s.addr {
-            ADDRESS_BASE_1 => { s.i2c.write(0x00, &[0xFF]).map_err(Error::I2c)?; }
-            ADDRESS_BASE_2 => { s.i2c.write(0x00, &[0x00]).map_err(Error::I2c)?; }
-            _other         => { return Err(Error::WrongI2CAddress)               }
+            ADDRESS_BASE_1 => { let _= s.i2c.write(0x00, &[0xFF]); } //The result is not used because it  will be an I2C error, because theses commands reset sensor and set-up
+            ADDRESS_BASE_2 => { let _= s.i2c.write(0x00, &[0x00]); } //its address, and the sensor do not respond with Ack-bit, so i2c method will interpret it as an error.
+            _other         => { return Err(Error::WrongI2CAddress) }
         }
        
         // Read initial bitmap from device
@@ -260,16 +259,18 @@ where
     //
     // OUTPUTS : - Result --> Ok(Bfield struct), or Err(Error struct) 
     //
-    pub fn get_b_mean(&mut self, n : u16, delay : &mut rppal::hal::Delay) -> Result<Bfield, Error<E>>  {
+    pub fn get_b_mean(&mut self, n: u16, t: u16, delay: &mut rppal::hal::Delay) -> Result<Bfield, Error<E>>  {
         //initialize b, and set counter to zero
         let mut b = Bfield {bx:0.0, by:0.0, bz:0.0, ux:0.0, uy:0.0, uz:0.0};
         let mut j = 0; //counter of valid measurements
         let mut i = 0; //counter of invalid measurements (read_raw function returning an error )
+
         //These variables are needed to compte Mean and StandardDeviation iteratively
         let (mut bx_prev, mut by_prev, mut bz_prev): (f32, f32, f32);
+        
         //Looping until we get N valid measurements
         while j!= n {
-            (*delay).delay_ms(1 as u16);
+            (*delay).delay_ms(t as u16);
             match self.read()  {
                 Ok(b_new) => {
                     j += 1;    //Iterating the number of valid measurements
@@ -310,10 +311,10 @@ where
     //
     // OUTPUTS : - Result --> Ok(Bfield struct), or Err(Error struct) 
     // 
-    pub fn get_bxy_angle(&mut self, n : u16, delay : &mut rppal::hal::Delay) -> Result<(f32, f32), Error<E>>  {
+    pub fn get_bxy_angle(&mut self, n: u16, t: u16, delay: &mut rppal::hal::Delay) -> Result<(f32, f32), Error<E>>  {
         let angle_xy:   f32;
         let u_angle_xy: f32;
-        match self.get_b_mean(n, delay) {
+        match self.get_b_mean(n, t, delay) {
             Ok(b) => {
                 (angle_xy, u_angle_xy) = b.b_angle_xy();
                 Ok((angle_xy, u_angle_xy))
