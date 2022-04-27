@@ -1,9 +1,7 @@
-use embedded_hal::blocking::delay::*;
-
 use core::marker::PhantomData;
 use log::{debug};
 use bitflags::bitflags;
-use embedded_hal::blocking::i2c;
+use embedded_hal::blocking::{i2c, delay::*};
 
 #[cfg(feature = "std")]
 extern crate std;
@@ -250,6 +248,12 @@ where
     }
 
 
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+//                        AJOUT PAR MOI (ANTOINE DE LAUNAY)
+///////////////////////////////////////////////////////////////////////////////////////////
+
     // Method that read N times the magnetic field values on the sensor and return
     // a Bfield struct containing the mean of the N measurements.
     // The means and standard-deviations are computed iteratively
@@ -259,7 +263,7 @@ where
     //
     // OUTPUTS : - Result --> Ok(Bfield struct), or Err(Error struct) 
     //
-    pub fn get_b_mean(&mut self, n: u16, t: u16, delay: &mut rppal::hal::Delay) -> Result<Bfield, Error<E>>  {
+    pub fn get_b_mean(&mut self, n: u16, delay: &mut rppal::hal::Delay) -> Result<Bfield, Error<E>>  {
         //initialize b, and set counter to zero
         let mut b = Bfield {bx:0.0, by:0.0, bz:0.0, ux:0.0, uy:0.0, uz:0.0};
         let mut j = 0; //counter of valid measurements
@@ -270,7 +274,7 @@ where
         
         //Looping until we get N valid measurements
         while j!= n {
-            (*delay).delay_ms(t as u16);
+            (*delay).delay_us(400 as u16);
             match self.read()  {
                 Ok(b_new) => {
                     j += 1;    //Iterating the number of valid measurements
@@ -311,10 +315,10 @@ where
     //
     // OUTPUTS : - Result --> Ok(Bfield struct), or Err(Error struct) 
     // 
-    pub fn get_bxy_angle(&mut self, n: u16, t: u16, delay: &mut rppal::hal::Delay) -> Result<(f32, f32), Error<E>>  {
+    pub fn get_bxy_angle(&mut self, n: u16, delay: &mut rppal::hal::Delay) -> Result<(f32, f32), Error<E>>  {
         let angle_xy:   f32;
         let u_angle_xy: f32;
-        match self.get_b_mean(n, t, delay) {
+        match self.get_b_mean(n, delay) {
             Ok(b) => {
                 (angle_xy, u_angle_xy) = b.b_angle_xy();
                 Ok((angle_xy, u_angle_xy))
@@ -326,14 +330,6 @@ where
 }
 
 
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////////
-//                        AJOUT PAR MOI (ANTOINE DE LAUNAY)
-////////////////////////////////////////////////////////////////////////////////////
 
 // Struct that contains the 3 components of the magnetic field, in mT, and their standard-deviations (>0 if several measurements are made)
 // "Values" already exists but does not include standard-deviation. A little bit redundant...

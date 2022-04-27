@@ -4,7 +4,7 @@ use tlv493d_raspberry::{Tlv493d, *};
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create MPU
     let mut i2c   = I2c::new().expect("1");
-    let addr      =  ADDRESS_BASE_2;
+    let addr      =  ADDRESS_BASE_1;
     let mode      = Mode::Master;
     let mut tlv   = Tlv493d::new(i2c, addr, &mode).unwrap();
     let mut delay = rppal::hal::Delay::new();
@@ -15,12 +15,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut _u_angle_xy: f32;
 
     //Setting up the number of measurement on which we want to compute the mean, and delay to apply between each measurement
-    let n = 20;
-    let t = 1; //milliseconds
+    let n = 100;
 
     loop {
         // get 3d hall data (computing means and standard-deviations over N measurements) : bx, by, bz
-        match tlv.get_b_mean(n, t, &mut delay) 
+        match tlv.get_b_mean(n, &mut delay) 
         {
             Ok(b) => 
             {   (angle_xy, _u_angle_xy) = b.b_angle_xy();
