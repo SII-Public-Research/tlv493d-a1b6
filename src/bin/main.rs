@@ -11,8 +11,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     //Initialize the variable which will contain data
     let mut _bfield: Bfield;
-    let mut angle_xy: f32;
-    let mut _u_angle_xy: f32;
 
     //Setting up the number of measurement on which we want to compute the mean, and delay to apply between each measurement
     let n = 100;
@@ -22,8 +20,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         match tlv.get_b_mean(n, &mut delay) 
         {
             Ok(b) => 
-            {   (angle_xy, _u_angle_xy) = b.b_angle_xy();
-                println!("Bx={:.1}mT By={:.1}mT Bz={:.1}mT AngleXY={:.1}°",b.bx, b.by, b.bz, angle_xy);
+            {   println!("Bx={:.1}mT By={:.1}mT Bz={:.1}mT",b.bx, b.by, b.bz);
                 _bfield = b;
             }
 
