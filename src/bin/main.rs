@@ -1,5 +1,5 @@
 use rppal::i2c::I2c;
-use tlv493d_raspberry::{Tlv493d, *};
+use tlv493d_a1b6_raspberry::{Tlv493d, *};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create MPU

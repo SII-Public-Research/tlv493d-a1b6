@@ -1,5 +1,5 @@
 [package]
-name = "tlv493d_raspberry"
+name = "tlv493d_a1b6_raspberry"
 authors = ["Antoine deLAUNAY <antoine.delaunay@sii.fr>"]
 version = "0.1.0"
 edition = "2021"
@@ -9,7 +9,6 @@ edition = "2021"
 [dependencies]
 rppal = { version = "0.13.1", features = ["hal"] }
 embedded-hal = "0.2.7"
-#sensor-tlv493d = "0.1.0"
 
 #Other dependencies for the "sensor-tlv493d" crate, modified here 
 bitflags = "1.2.1"

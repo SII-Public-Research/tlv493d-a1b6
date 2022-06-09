@@ -101,7 +101,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tlv493d_raspberry"
+name = "tlv493d_a1b6_raspberry"
 version = "0.1.0"
 dependencies = [
  "bitflags",
