@@ -2,7 +2,7 @@
 
 Rust driver for tlv493d_a1b6 sensor.
 
-The crate is initially made by Ryankurte.
+The crate is initially made by Ryankurte ( https://crates.io/crates/sensor-tlv493d/0.1.0 ).
 Changed some small things because it was not working for me (the initialisation of the sensor, with the address setting up, ...)
 
 I added somes functions for specific things I needed to do like:
