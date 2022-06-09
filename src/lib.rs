@@ -7,13 +7,22 @@ use embedded_hal::blocking::{i2c, delay::*};
 extern crate std;
 
 
+// The crate is initially made by Ryankurte.
+// Changed some small things because it was not working for me (the initialisation of the sensor, with the address setting up, ...)
+//
+// I added somes functions for specific things I needed to do like:
+//      - Compute mean over N measurements, and compute standard-deviation of the measurement
+//      - Compute the angle (angle between the X axis and the vector Bxy) and its standard-deviation (based on bx, by, bz standard-deviations)
+//      - Added another struct (because "Values" struct has private fields !)
+//
+// But these functions used delay type from Rppal crate (developped to be used on a raspberry pi 3). So it will not work on another device
+// because of this, unless the crate is adapted by someone.
 
 
 
-
-//////////////////////////////////////////////////////////////////////////////////////
-//              CRATE "sensor_tlv493d" DE RYANKURTE MODIFIEE POUR RPPAL
-/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//       CRATE "sensor_tlv493d" BY RYANKURTE, with small changes (more reliable for my use)
+////////////////////////////////////////////////////////////////////////////////////////////////
 
 pub struct Tlv493d<I2c, E> {
     pub i2c: I2c,
@@ -26,7 +35,7 @@ pub struct Tlv493d<I2c, E> {
 // Base address for Tlv493d, bottom bit set during power up
 // based on value of SDA.
 pub const ADDRESS_BASE_1: u8 = 0b1011110;
-pub const ADDRESS_BASE_2: u8 = 0b0011111;
+pub const ADDRESS_BASE_2: u8 = 0b0011111; /// Added ///
 
 // Read registers for the Tlv493d
 pub enum ReadRegisters {
@@ -104,7 +113,7 @@ pub enum Error<E: core::fmt::Debug> {
     AdcLockup,
 
     // Uncorrect I2C address
-    #[cfg_attr(feature = "std", error("Sensor I2C address must be 0x5E or 0x1F"))] 
+    #[cfg_attr(feature = "std", error("Sensor I2C address must be 0x5E or 0x1F"))]  /// Added ///
     WrongI2CAddress,
 
     // Underlying I2C device error
@@ -132,7 +141,7 @@ where
         let _= s.i2c.write(0xFF, &[]);
 
         // Send reset command
-        match s.addr {
+        match s.addr {                                               //// Modified ////
             ADDRESS_BASE_1 => { let _= s.i2c.write(0x00, &[0xFF]); } //The result is not used because it  will be an I2C error, because theses commands reset sensor and set-up
             ADDRESS_BASE_2 => { let _= s.i2c.write(0x00, &[0x00]); } //its address, and the sensor do not respond with Ack-bit, so i2c method will interpret it as an error.
             _other         => { return Err(Error::WrongI2CAddress) }
@@ -237,7 +246,7 @@ where
     //  OUTPUTS :   - Result<Values, Error<E>>
     //                where Values contains the values ==> Bx, By, Bz, Temp (with good units)
     //
-    pub fn read(&mut self) -> Result<Values, Error<E>> {
+    pub fn read(&mut self) -> Result<Values, Error<E>> { //// Can not really be used because Values's field are private.... ////
         let raw = self.read_raw()?;
         Ok(Values {
             x: raw[0] as f32 * 0.098f32,
@@ -251,7 +260,7 @@ where
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-//                        AJOUT PAR MOI (ANTOINE DE LAUNAY)
+//                                  ADDED BY ME
 ///////////////////////////////////////////////////////////////////////////////////////////
 
     // Method that read N times the magnetic field values on the sensor and return
@@ -293,8 +302,8 @@ where
                 }
                 Err(error) => {
                     i += 1;   //Iterating the number of invalid mesurements
-                    if i > n {
-                        return Err(error);
+                    if i > n { 
+                        return Err(error); // If there are too many errors while trying to do the N measurements, return error
                     }
                 }
             }
@@ -341,9 +350,6 @@ pub struct Bfield {
     pub uy : f32, // Standard deviation for X axis compenent
     pub uz : f32, // Standard deviation for Z axis component
 }
-
-
-
 
 
 impl Bfield {
