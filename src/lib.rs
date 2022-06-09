@@ -15,7 +15,7 @@ extern crate std;
 //      - Compute the angle (angle between the X axis and the vector Bxy) and its standard-deviation (based on bx, by, bz standard-deviations)
 //      - Added another struct (because "Values" struct has private fields !)
 //
-// But these functions used delay type from Rppal crate (developped to be used on a raspberry pi 3). So it will not work on another device
+// But these functions used delay type from Rppal crate (we work on a raspberry pi 3). So it may not work on another device
 // because of this, unless the crate is adapted by someone.
 
 
