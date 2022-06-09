@@ -17,6 +17,8 @@ extern crate std;
 //
 // But these functions used delay type from Rppal crate (we work on a raspberry pi 3). So it may not work on another device
 // because of this, unless the crate is adapted by someone.
+//
+// /!\ During tests, Master mode was working well, but not the others ones...
 
 
 
