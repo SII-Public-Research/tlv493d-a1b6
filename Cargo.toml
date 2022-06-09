@@ -3,6 +3,8 @@ name = "tlv493d_a1b6_raspberry"
 authors = ["Antoine deLAUNAY <antoine.delaunay@sii.fr>"]
 version = "0.1.0"
 edition = "2021"
+license = "MPL-2.0"
+description = "Rust driver for tlv493d_a1b6 sensor on raspberry pi. Initially made by user ryankurte."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
