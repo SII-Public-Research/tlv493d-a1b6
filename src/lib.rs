@@ -362,23 +362,16 @@ impl Bfield {
     // INPUTS  : - b : Bfield struct.
     //
     // OUTPUTS : - angle_xy : f32
-    //                --->       1000.0 if magnetic field is too low to get a reliable value
-    //                ---> 0.0 to 360.0 if measurement is correctly done
+    //                ---> 0.0 to 360.0
     //           - u_angle_xy : f32 (computed standard-deviation on angle_xy, in degrees °)
     //
     pub fn b_angle_xy(& self) -> (f32,f32) 
     {
         let b = self;
-        //Norm of magnetic field. If it is too low, the computed angle will not be reliable (it will mostly be based on noise)
-        let norm_b = ( b.bx.powf(2.0) + b.by.powf(2.0) + b.bz.powf(2.0) ).sqrt();
-        if norm_b > 1.5 {
-            //Compute angle (four quadrant arctangent of By/Bx ), and its standard-deviation.
-            let angle_xy = b.by.atan2(b.bx) * 180.0 / 3.1415;
-            let u_angle_xy = ( (b.ux * b.by / (b.bx*b.bx + b.by*b.by)).powf(2.0)   +   (b.uy / (b.bx + b.by*b.by/b.bx )).powf(2.0) ).sqrt() * 180.0/3.1415;
-            (angle_xy, u_angle_xy)
-        } else {
-            (1000.0, 0.0)
-        }
+        //Compute angle (four quadrant arctangent of By/Bx ), and its standard-deviation.
+        let angle_xy = b.by.atan2(b.bx) * 180.0 / 3.1415;
+        let u_angle_xy = ( (b.ux * b.by / (b.bx*b.bx + b.by*b.by)).powf(2.0)   +   (b.uy / (b.bx + b.by*b.by/b.bx )).powf(2.0) ).sqrt() * 180.0/3.1415;
+        (angle_xy, u_angle_xy)
     }
 
 }
