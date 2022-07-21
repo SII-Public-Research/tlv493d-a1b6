@@ -1,7 +1,7 @@
 [package]
 name = "tlv493d_a1b6_raspberry"
 authors = ["Antoine deLAUNAY <antoine.delaunay@sii.fr>"]
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 license = "MPL-2.0"
 description = "Rust driver for tlv493d_a1b6 sensor on raspberry pi. Initially made by user ryankurte."
