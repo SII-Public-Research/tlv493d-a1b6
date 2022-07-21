@@ -369,9 +369,17 @@ impl Bfield {
     {
         let b = self;
         //Compute angle (four quadrant arctangent of By/Bx ), and its standard-deviation.
-        let angle_xy = b.by.atan2(b.bx) * 180.0 / 3.1415;
-        let u_angle_xy = ( (b.ux * b.by / (b.bx*b.bx + b.by*b.by)).powf(2.0)   +   (b.uy / (b.bx + b.by*b.by/b.bx )).powf(2.0) ).sqrt() * 180.0/3.1415;
-        (angle_xy, u_angle_xy)
+        let theta = b.by.atan2(b.bx) * 180.0 / 3.1415;
+
+        let u_sensor:f32 = 0.01;         //uncertainty due to sensor accuracy (0.1mT/LSB, and mean over 150 points)
+        let u_hysteresis:f32 = 0.115;    //uncertainty due to hysteresis (hysteresis up to +-0.2mT, measured on our sensor)
+        let u_bi:f32 = (u_sensor.powi(2) + u_hysteresis.powi(2)).sqrt(); //uncertainty on Bx and on By.
+
+        let dbx:f32 = -b.by / ( b.bx.powi(2) + b.by.powi(2) ); //derivative of Theta / bx
+        let dby:f32 = b.bx / ( b.bx.powi(2) + b.by.powi(2) ); //derivative of Theta / by
+
+        let u_theta:f32 = u_bi * ( dbx.powi(2) + dby.powi(2) ).sqrt() /3.1415*180.0;
+        (theta, u_theta)
     }
 
 }
