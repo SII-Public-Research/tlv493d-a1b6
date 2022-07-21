@@ -372,7 +372,7 @@ impl Bfield {
         let theta = b.by.atan2(b.bx) * 180.0 / 3.1415;
 
         let u_sensor:f32 = 0.01;         //uncertainty due to sensor accuracy (0.1mT/LSB, and mean over 150 points)
-        let u_hysteresis:f32 = 0.115;    //uncertainty due to hysteresis (hysteresis up to +-0.2mT, measured on our sensor)
+        let u_hysteresis:f32 = 0.25;    //uncertainty due to hysteresis (measured on our sensor)
         let u_bi:f32 = (u_sensor.powi(2) + u_hysteresis.powi(2)).sqrt(); //uncertainty on Bx and on By.
 
         let dbx:f32 = -b.by / ( b.bx.powi(2) + b.by.powi(2) ); //derivative of Theta / bx
