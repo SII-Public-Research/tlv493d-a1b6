@@ -15,3 +15,7 @@ embedded-hal = "0.2.7"
 #Other dependencies for the "sensor-tlv493d" crate, modified here 
 bitflags = "1.2.1"
 log = "0.4.11"
+
+[features]
+std = []
+default = ["std"]
