@@ -275,13 +275,11 @@ where
     //
     // OUTPUTS : - Result --> Ok(Bfield struct), or Err(Error struct)
     //
-    pub fn get_b_mean<UXX, Delay: DelayUs<UXX>>(
+    pub fn get_b_mean<Delay: DelayUs<u16>>(
         &mut self,
         n: u16,
         delay: &mut Delay,
     ) -> Result<Bfield, Error<E>>
-    where
-        u16: Into<UXX>,
     {
         //initialize b, and set counter to zero
         let mut b = Bfield {
@@ -300,7 +298,7 @@ where
 
         //Looping until we get N valid measurements
         while j != n {
-            (*delay).delay_us(400.into());
+            (*delay).delay_us(400 as u16);
             match self.read() {
                 Ok(b_new) => {
                     j += 1; //Iterating the number of valid measurements
@@ -340,13 +338,11 @@ where
     //
     // OUTPUTS : - Result --> Ok(Bfield struct), or Err(Error struct)
     //
-    pub fn get_bxy_angle<UXX, Delay: DelayUs<UXX>>(
+    pub fn get_bxy_angle<Delay: DelayUs<u16>>(
         &mut self,
         n: u16,
         delay: &mut Delay,
     ) -> Result<(f32, f32), Error<E>>
-    where
-        u16: Into<UXX>,
     {
         let angle_xy: f32;
         let u_angle_xy: f32;
